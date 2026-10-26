@@ -1,4 +1,4 @@
-call C:\AMDDesignTools\2025.2\Vivado\settings64.bat
+call X:\Xilinx\2025.2.1\Vivado\settings64.bat
 call vivado -nolog -nojournal -mode=batch -source=./tcl/make_project.tcl
 call vivado -nolog -nojournal -mode=batch -source=./tcl/impl.tcl
 :: commenting out the vitis part since we will be testing in linux
