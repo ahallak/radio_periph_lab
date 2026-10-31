@@ -120,7 +120,7 @@ architecture arch_imp of full_radio_v1_0_S00_AXI is
   signal aw_en        : std_logic;
 
   signal fake_adc_tdata  : std_logic_vector(15 downto 0);
-  signal tuner_tdata     : std_logic_vector(15 downto 0);
+  signal tuner_tdata     : std_logic_vector(31 downto 0);
   signal fake_adc_tvalid : std_logic;
   signal tuner_tvalid    : std_logic;
 
@@ -129,6 +129,9 @@ architecture arch_imp of full_radio_v1_0_S00_AXI is
 
   signal i_sig : signed(32 downto 0);
   signal q_sig : signed(32 downto 0);
+  
+  signal shifted_i : std_logic_vector(15 downto 0);
+  signal shifted_q : std_logic_vector(15 downto 0);
 
   signal timer_reg : std_logic_vector(31 downto 0);
 
@@ -165,7 +168,17 @@ architecture arch_imp of full_radio_v1_0_S00_AXI is
       m_axis_dout_tdata  : out std_logic_vector(79 downto 0)
     );
   end component;
-
+  
+    component filter_chain
+    port (
+        aclk               : in std_logic;
+        s_axis_data_tvalid : in std_logic;
+        s_axis_data_tdata  : in std_logic_vector(15 downto 0);
+        m_axis_data_tdata  : out std_logic_vector(15 downto 0);
+        m_axis_data_tvalid : out std_logic
+    );
+    end component;
+    
 begin
   -- I/O Connections assignments
 
@@ -473,21 +486,23 @@ begin
     s_axis_a_tvalid    => tuner_tvalid,
     s_axis_a_tdata     => tuner_tdata,
     s_axis_b_tvalid    => fake_adc_tvalid,
-    s_axis_b_tdata     => fake_adc_tdata,
+    s_axis_b_tdata     => x"0000" & fake_adc_tdata,
     m_axis_dout_tvalid => complex_mult_tvalid,
     m_axis_dout_tdata  => complex_mult_tdata
   );
 
   i_sig <= signed(complex_mult_tdata(72 downto 40));
   q_sig <= signed(complex_mult_tdata(32 downto 0));
+  
+  shifted_i <= std_logic_vector(shift_right(i_sig, 14)(15 downto 0));
+  shifted_q <= std_logic_vector(shift_right(q_sig, 14)(15 downto 0));
 
   filter_chain_I_inst : filter_chain
   port map
   (
     aclk               => S_AXI_ACLK,
     s_axis_data_tvalid => complex_mult_tvalid,
-    s_axis_data_tdata  => shift_right(i_sig, 14)(15 downto 0),
-    enable_filters     => '1', -- No requirement to keep this
+    s_axis_data_tdata  => shifted_i,
     m_axis_data_tdata  => m_axis_tdata(31 downto 16),
     m_axis_data_tvalid => m_axis_tvalid -- Timed in sync with Q component
   );
@@ -497,8 +512,7 @@ begin
   (
     aclk               => S_AXI_ACLK,
     s_axis_data_tvalid => complex_mult_tvalid,
-    s_axis_data_tdata  => shift_right(q_sig, 14)(15 downto 0),
-    enable_filters     => '1',
+    s_axis_data_tdata  => shifted_q,
     m_axis_data_tdata  => m_axis_tdata(15 downto 0),
     m_axis_data_tvalid => open -- unnecessary signal, will be timed in sync with I component.
   );
