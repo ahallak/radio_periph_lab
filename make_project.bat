@@ -7,7 +7,7 @@ call C:\AMDDesignTools\2025.2.1\Vivado\settings64.bat
 )
 
 if exist  W:\Xilinx\2025.2.1\Vivado\settings64.bat (
-W:\Xilinx\2025.2.1\Vivado\settings64.bat
+call W:\Xilinx\2025.2.1\Vivado\settings64.bat
 )
 
 call vivado -nolog -nojournal -mode=batch -source=./tcl/make_project.tcl
