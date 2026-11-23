@@ -126,6 +126,8 @@ architecture arch_imp of full_radio_v1_0_S00_AXI is
 
   signal complex_mult_tdata  : std_logic_vector(79 downto 0);
   signal complex_mult_tvalid : std_logic;
+  signal m_axis_tvalid_i : std_logic;
+  signal ctl_enable : std_logic;
 
   signal i_sig : signed(32 downto 0);
   signal q_sig : signed(32 downto 0);
@@ -504,8 +506,11 @@ begin
     s_axis_data_tvalid => complex_mult_tvalid,
     s_axis_data_tdata  => shifted_i,
     m_axis_data_tdata  => m_axis_tdata(31 downto 16),
-    m_axis_data_tvalid => m_axis_tvalid -- Timed in sync with Q component
+    m_axis_data_tvalid => m_axis_tvalid_i -- Timed in sync with Q component
   );
+
+  ctl_enable <= slv_reg2(1);
+  m_axis_tvalid <= m_axis_tvalid_i and ctl_enable;
 
   filter_chain_Q_inst : filter_chain
   port map
