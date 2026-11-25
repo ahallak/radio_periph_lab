@@ -16,8 +16,10 @@ entity full_radio_v1_0_S00_AXI is
   );
   port (
     -- Users to add ports here
-    m_axis_tdata  : out std_logic_vector(31 downto 0);
-    m_axis_tvalid : out std_logic;
+    m_axis_audio_tdata  : out std_logic_vector(31 downto 0);
+    m_axis_audio_tvalid : out std_logic;
+    m_axis_fifo_tdata   : out std_logic_vector(31 downto 0);
+    m_axis_fifo_tvalid  : out std_logic;
     -- User ports ends
     -- Do not modify the ports beyond this line
 
@@ -123,11 +125,12 @@ architecture arch_imp of full_radio_v1_0_S00_AXI is
   signal tuner_tdata     : std_logic_vector(31 downto 0);
   signal fake_adc_tvalid : std_logic;
   signal tuner_tvalid    : std_logic;
+  signal m_axis_tvalid_i : std_logic;
+  
+  signal m_axis_tdata_i : std_logic_vector(31 downto 0);
 
   signal complex_mult_tdata  : std_logic_vector(79 downto 0);
   signal complex_mult_tvalid : std_logic;
-  signal m_axis_tvalid_i : std_logic;
-  signal ctl_enable : std_logic;
 
   signal i_sig : signed(32 downto 0);
   signal q_sig : signed(32 downto 0);
@@ -505,12 +508,17 @@ begin
     aclk               => S_AXI_ACLK,
     s_axis_data_tvalid => complex_mult_tvalid,
     s_axis_data_tdata  => shifted_i,
-    m_axis_data_tdata  => m_axis_tdata(31 downto 16),
+    m_axis_data_tdata  => m_axis_tdata_i(31 downto 16),
     m_axis_data_tvalid => m_axis_tvalid_i -- Timed in sync with Q component
   );
 
-  ctl_enable <= slv_reg2(1);
-  m_axis_tvalid <= m_axis_tvalid_i and ctl_enable;
+  m_axis_fifo_tvalid <= not(slv_reg2(1)) and m_axis_tvalid_i;
+  m_axis_audio_tvalid <= not(slv_reg2(2)) and m_axis_tvalid_i;
+  
+  -- Since full radio periph provided doesn't care about valid, we have to take drastic measures.
+  -- So zero out the tdata.
+  m_axis_fifo_tdata <= m_axis_tdata_i when slv_reg2(1) = '0' else (others=>'0');
+  m_axis_audio_tdata <= m_axis_tdata_i when slv_reg2(2) = '0' else (others=>'0');
 
   filter_chain_Q_inst : filter_chain
   port map
@@ -518,7 +526,7 @@ begin
     aclk               => S_AXI_ACLK,
     s_axis_data_tvalid => complex_mult_tvalid,
     s_axis_data_tdata  => shifted_q,
-    m_axis_data_tdata  => m_axis_tdata(15 downto 0),
+    m_axis_data_tdata  => m_axis_tdata_i(15 downto 0),
     m_axis_data_tvalid => open -- unnecessary signal, will be timed in sync with I component.
   );
 

@@ -6,6 +6,14 @@ if exist C:\AMDDesignTools\2025.2.1\Vivado\settings64.bat (
 call C:\AMDDesignTools\2025.2.1\Vivado\settings64.bat
 )
 
+if exist C:\Xilinx\2025.2\Vivado\settings64.bat (
+call C:\Xilinx\2025.2\Vivado\settings64.bat
+)
+
+if exist C:\Xilinx\2025.2.1\Vivado\settings64.bat (
+call C:\Xilinx\2025.2.1\Vivado\settings64.bat
+)
+
 if exist  W:\Xilinx\2025.2.1\Vivado\settings64.bat (
 call W:\Xilinx\2025.2.1\Vivado\settings64.bat
 )

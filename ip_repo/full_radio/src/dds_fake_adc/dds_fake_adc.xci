@@ -5,7 +5,7 @@
     "cell_name": "full_radio_v1_0_S00_AXI_inst/fake_adc_inst",
     "component_reference": "xilinx.com:ip:dds_compiler:6.0",
     "ip_revision": "28",
-    "gen_directory": "c:/users/amjed/desktop/lab10/radio_periph_lab/vivado/radio_periph_lab.tmp/full_radio_v1_0_project/full_radio_v1_0_project.gen/sources_1/ip/dds_fake_adc",
+    "gen_directory": "c:/users/jedha/desktop/lab11/radio_periph_lab/vivado/radio_periph_lab.tmp/full_radio_v1_0_project/full_radio_v1_0_project.gen/sources_1/ip/dds_fake_adc",
     "parameters": {
       "component_parameters": {
         "Component_Name": [ { "value": "dds_fake_adc", "resolve_type": "user", "usage": "all" } ],
@@ -180,7 +180,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "28" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "c:/users/amjed/desktop/lab10/radio_periph_lab/vivado/radio_periph_lab.tmp/full_radio_v1_0_project/full_radio_v1_0_project.gen/sources_1/ip/dds_fake_adc" } ],
+        "OUTPUTDIR": [ { "value": "c:/users/jedha/desktop/lab11/radio_periph_lab/vivado/radio_periph_lab.tmp/full_radio_v1_0_project/full_radio_v1_0_project.gen/sources_1/ip/dds_fake_adc" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2025.2.1" } ],
@@ -359,5 +359,5 @@
       }
     }
   },
-  "checksum": "d3ebb8f5"
+  "checksum": "b8c48c51"
 }

@@ -1,0 +1,90 @@
+<HTML>
+    <TITLE>Zybo Z7 Radio - AH Lab 11
+    </TITLE>
+    <BODY BGCOLOR="peachpuff">
+    <H1>Zybo Z7 Radio Page - Amjed Hallak, Lab 11</H1>
+    <a href="./cgi-bin/setup_all.sh">Initialize PL/Radio</a>
+    <br>The above link will initialize the PL with your bitfile, configure the codec, and start the udp-streamer program
+    <p>
+    <H2>Radio Tuning</H2>
+    <form action = "/cgi-bin/configure_radio.py" method = "post">
+        Fake ADC Frequency (Hz): <input type = "number" name = "adc_freq_hz"><br />
+        Radio Tune Center Frequency (Hz): <input type = "number" name = "tune_freq_hz" /> 
+        <input type="checkbox" id="streaming" name="streaming" value="streaming">
+        <label for="streaming"> Enable UDP Streaming</label>
+        <input type="checkbox" id="audio" name="audio" value="audio">
+        <label for="audio"> Enable Audio</label><br> 
+        <input type = "submit" value = "Submit" />
+    </form>
+    <form action = "/cgi-bin/set_ip_params.py" method = "post">
+        Stream Destination IP Address: <input type = "text" name = "ip" id="ip" value="169.254.1.10"><br />
+        UDP Destination Port: <input type = "number" name = "port" id="port" value=25344><br />
+        <input type = "submit" value = "Set" />
+    </form>
+    <H2>Milestones / Demonstrations</H2>
+    <a href="./cgi-bin/test_radio">Run Lab 10 test_radio (about a 10 second run - it's fun to watch the MATLAB while this runs.)</a><br>
+    <a href="./cgi-bin/ms_udp_gen.sh">Run UDP Gen Milestone (UDP frequency sweep - you will need the MATLAB running)</a> <br>
+    <a href="./cgi-bin/ms_fifo_rd.sh">Run FIFO Reader Milestone (Reads 480,000 words, or about 10 seconds of FIFO data... nothing special)</a> <br>   
+   <!--
+    #####################################################
+    # DISCLAIMER: NOT MY WORK!!!!! but this is important.
+    #####################################################
+    -->
+    <script>
+    function loadIpCfg() {
+        fetch("/cgi-bin/get_ip_cfg.py", { cache: "no-store" })
+        .then(r => r.json())
+        .then(cfg => {
+            if (cfg.ip) document.getElementById("ip").value = cfg.ip;
+            if (cfg.port) document.getElementById("port").value = cfg.port;
+        })
+        .catch(() => {});  // keep the default values if it fails
+    }
+    window.addEventListener("pageshow", loadIpCfg);
+    </script>
+    </BODY>
+<div class="bonus">
+  <a href="http://aka.ms/confidential " target="_blank" class="big-red">
+    BIG BUTTON!
+  </a>
+  <div class="bonus-note">(Reserved for grading emergencies only, or if your name is Cam)</div>
+</div>
+<style>
+.bonus { margin-top: 30px; text-align: center; width: fit-content; }
+.big-red {
+  display: inline-block;
+  width: 120px;
+  height: 120px;
+  line-height: 120px;
+  border-radius: 50%;
+  background: #d62828;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  text-decoration: none;
+  border: 6px solid #888;
+  box-shadow: 0 8px 0 #8b1a1a, 0 10px 12px rgba(0,0,0,0.3);
+  animation: nervous 4s infinite;
+}
+.big-red:hover { background: #e63946; }
+.big-red:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 #8b1a1a;
+}
+.bonus-note {
+  margin-top: 8px;
+  font-size: 12px;
+  font-style: italic;
+  color: #333;
+}
+@keyframes nervous {
+  0%, 85%, 100% { transform: translate(0, 0); }
+  87% { transform: translate(-2px, 0); }
+  89% { transform: translate(2px, 0); }
+  91% { transform: translate(-2px, 0); }
+  93% { transform: translate(2px, 0); }
+}
+</style>
+</HTML>
+    

@@ -133,11 +133,10 @@ jhu.edu:user:full_radio:1.0\
 jhuapl.edu:user:lowlevel_dac_intfc:1.1\
 xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:proc_sys_reset:5.0\
-xilinx.com:ip:system_ila:1.1\
 xilinx.com:ip:xpm_cdc_gen:1.0\
 xilinx.com:inline_hdl:ilconstant:1.0\
-xilinx.com:ip:axis_broadcaster:1.1\
 xilinx.com:ip:axi_fifo_mm_s:4.3\
+xilinx.com:ip:system_ila:1.1\
 "
 
    set list_ips_missing ""
@@ -587,21 +586,6 @@ proc create_root_design { parentCell } {
   # Create instance: rst_ps7_0_125M, and set properties
   set rst_ps7_0_125M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_125M ]
 
-  # Create instance: system_ila_0, and set properties
-  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 system_ila_0 ]
-  set_property -dict [list \
-    CONFIG.ALL_PROBE_SAME_MU_CNT {2} \
-    CONFIG.C_DATA_DEPTH {1024} \
-    CONFIG.C_EN_STRG_QUAL {1} \
-    CONFIG.C_MON_TYPE {MIX} \
-    CONFIG.C_NUM_MONITOR_SLOTS {3} \
-    CONFIG.C_PROBE0_MU_CNT {2} \
-    CONFIG.C_SLOT {2} \
-    CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
-    CONFIG.C_SLOT_2_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
-  ] $system_ila_0
-
-
   # Create instance: xpm_cdc_gen_0, and set properties
   set xpm_cdc_gen_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xpm_cdc_gen:1.0 xpm_cdc_gen_0 ]
   set_property -dict [list \
@@ -612,35 +596,6 @@ proc create_root_design { parentCell } {
 
   # Create instance: every_beat_is_pkt, and set properties
   set every_beat_is_pkt [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconstant:1.0 every_beat_is_pkt ]
-
-  # Create instance: axis_broadcaster_0, and set properties
-  set axis_broadcaster_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_broadcaster:1.1 axis_broadcaster_0 ]
-  set_property -dict [list \
-    CONFIG.HAS_TKEEP {0} \
-    CONFIG.HAS_TLAST {0} \
-    CONFIG.HAS_TREADY {0} \
-    CONFIG.HAS_TSTRB {0} \
-    CONFIG.M_TDATA_NUM_BYTES {4} \
-    CONFIG.M_TUSER_WIDTH {0} \
-    CONFIG.S_TDATA_NUM_BYTES {4} \
-    CONFIG.S_TUSER_WIDTH {0} \
-    CONFIG.TDEST_WIDTH {0} \
-    CONFIG.TID_WIDTH {0} \
-  ] $axis_broadcaster_0
-
-  set_property -dict [list \
-    CONFIG.HAS_TKEEP.VALUE_MODE {auto} \
-    CONFIG.HAS_TLAST.VALUE_MODE {auto} \
-    CONFIG.HAS_TREADY.VALUE_MODE {auto} \
-    CONFIG.HAS_TSTRB.VALUE_MODE {auto} \
-    CONFIG.M_TDATA_NUM_BYTES.VALUE_MODE {auto} \
-    CONFIG.M_TUSER_WIDTH.VALUE_MODE {auto} \
-    CONFIG.S_TDATA_NUM_BYTES.VALUE_MODE {auto} \
-    CONFIG.S_TUSER_WIDTH.VALUE_MODE {auto} \
-    CONFIG.TDEST_WIDTH.VALUE_MODE {auto} \
-    CONFIG.TID_WIDTH.VALUE_MODE {auto} \
-  ] $axis_broadcaster_0
-
 
   # Create instance: axi_s2mm_fifo, and set properties
   set axi_s2mm_fifo [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_fifo_mm_s:4.3 axi_s2mm_fifo ]
@@ -654,18 +609,31 @@ proc create_root_design { parentCell } {
   ] $axi_s2mm_fifo
 
 
+  # Create instance: system_ila_0, and set properties
+  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 system_ila_0 ]
+  set_property -dict [list \
+    CONFIG.C_ADV_TRIGGER {false} \
+    CONFIG.C_DATA_DEPTH {4096} \
+    CONFIG.C_EN_STRG_QUAL {1} \
+    CONFIG.C_MON_TYPE {MIX} \
+    CONFIG.C_NUM_MONITOR_SLOTS {3} \
+    CONFIG.C_SLOT {2} \
+    CONFIG.C_SLOT_1_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
+    CONFIG.C_SLOT_2_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
+  ] $system_ila_0
+
+
   # Create interface connections
-  connect_bd_intf_net -intf_net axis_broadcaster_0_M00_AXIS [get_bd_intf_pins axis_broadcaster_0/M00_AXIS] [get_bd_intf_pins axi_s2mm_fifo/AXI_STR_RXD]
-connect_bd_intf_net -intf_net [get_bd_intf_nets axis_broadcaster_0_M00_AXIS] [get_bd_intf_pins axis_broadcaster_0/M00_AXIS] [get_bd_intf_pins system_ila_0/SLOT_0_AXIS]
-  connect_bd_intf_net -intf_net axis_broadcaster_0_M01_AXIS1 [get_bd_intf_pins axis_broadcaster_0/M01_AXIS] [get_bd_intf_pins lowlevel_dac_intfc_0/data_in]
-connect_bd_intf_net -intf_net [get_bd_intf_nets axis_broadcaster_0_M01_AXIS1] [get_bd_intf_pins axis_broadcaster_0/M01_AXIS] [get_bd_intf_pins system_ila_0/SLOT_2_AXIS]
-  connect_bd_intf_net -intf_net full_radio_0_m_axis [get_bd_intf_pins full_radio_0/m_axis] [get_bd_intf_pins axis_broadcaster_0/S_AXIS]
+  connect_bd_intf_net -intf_net axis_broadcaster_0_M01_AXIS1 [get_bd_intf_pins full_radio_0/m_axis_audio] [get_bd_intf_pins lowlevel_dac_intfc_0/data_in]
+connect_bd_intf_net -intf_net [get_bd_intf_nets axis_broadcaster_0_M01_AXIS1] [get_bd_intf_pins full_radio_0/m_axis_audio] [get_bd_intf_pins system_ila_0/SLOT_1_AXIS]
+  connect_bd_intf_net -intf_net full_radio_0_m_axis_fifo [get_bd_intf_pins full_radio_0/m_axis_fifo] [get_bd_intf_pins axi_s2mm_fifo/AXI_STR_RXD]
+connect_bd_intf_net -intf_net [get_bd_intf_nets full_radio_0_m_axis_fifo] [get_bd_intf_pins full_radio_0/m_axis_fifo] [get_bd_intf_pins system_ila_0/SLOT_2_AXIS]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_IIC_0 [get_bd_intf_ports IIC_0] [get_bd_intf_pins processing_system7_0/IIC_0]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins ps7_0_axi_periph/S00_AXI]
   connect_bd_intf_net -intf_net ps7_0_axi_periph_M00_AXI [get_bd_intf_pins full_radio_0/S00_AXI] [get_bd_intf_pins ps7_0_axi_periph/M00_AXI]
-connect_bd_intf_net -intf_net [get_bd_intf_nets ps7_0_axi_periph_M00_AXI] [get_bd_intf_pins full_radio_0/S00_AXI] [get_bd_intf_pins system_ila_0/SLOT_1_AXI]
+connect_bd_intf_net -intf_net [get_bd_intf_nets ps7_0_axi_periph_M00_AXI] [get_bd_intf_pins full_radio_0/S00_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
   connect_bd_intf_net -intf_net ps7_0_axi_periph_M01_AXI [get_bd_intf_pins ps7_0_axi_periph/M01_AXI] [get_bd_intf_pins axi_s2mm_fifo/S_AXI]
 
   # Create port connections
@@ -697,20 +665,18 @@ connect_bd_intf_net -intf_net [get_bd_intf_nets ps7_0_axi_periph_M00_AXI] [get_b
   connect_bd_net -net s00_axi_aclk_0_1  [get_bd_ports clk125] \
   [get_bd_pins lowlevel_dac_intfc_0/clk125] \
   [get_bd_pins ps7_0_axi_periph/M00_ACLK] \
-  [get_bd_pins system_ila_0/clk] \
   [get_bd_pins xpm_cdc_gen_0/dest_clk] \
   [get_bd_pins ps7_0_axi_periph/M01_ACLK] \
-  [get_bd_pins axis_broadcaster_0/aclk] \
   [get_bd_pins axi_s2mm_fifo/s_axi_aclk] \
-  [get_bd_pins full_radio_0/s00_axi_aclk]
+  [get_bd_pins full_radio_0/s00_axi_aclk] \
+  [get_bd_pins system_ila_0/clk]
   connect_bd_net -net xpm_cdc_gen_0_dest_rst_out  [get_bd_pins xpm_cdc_gen_0/dest_rst_out] \
   [get_bd_pins ps7_0_axi_periph/M00_ARESETN] \
-  [get_bd_pins system_ila_0/resetn] \
   [get_bd_pins lowlevel_dac_intfc_0/resetn] \
   [get_bd_pins ps7_0_axi_periph/M01_ARESETN] \
-  [get_bd_pins axis_broadcaster_0/aresetn] \
   [get_bd_pins axi_s2mm_fifo/s_axi_aresetn] \
-  [get_bd_pins full_radio_0/s00_axi_aresetn]
+  [get_bd_pins full_radio_0/s00_axi_aresetn] \
+  [get_bd_pins system_ila_0/resetn]
 
   # Create address segments
   assign_bd_address -offset 0x43C10000 -range 0x00010000 -with_name SEG_axi_fifo_mm_s_0_Mem0 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_s2mm_fifo/S_AXI/Mem0] -force
