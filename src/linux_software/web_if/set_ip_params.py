@@ -22,8 +22,9 @@ data = {
 with open("ip_cfg.json", "w", encoding="utf-8") as file:
     json.dump(data, file, indent=4)
 
-subprocess.run("kill -STOP $(ps | grep '[p]ython3 run.py' | awk '{print $1}')" , shell=True)
-subprocess.Popen("python3 run.py", start_new_session=True, shell=True)
+subprocess.run("kill -9 $(ps | grep '[p]ython3 run.py' | awk '{print $1}')" , shell=True)
+subprocess.Popen("python3 run.py", start_new_session=True, stdout=subprocess.DEVNULL,
+                 stdin=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
 
 print ("Content-type:text/html")
 print()

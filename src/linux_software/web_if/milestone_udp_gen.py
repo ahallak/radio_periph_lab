@@ -1,10 +1,20 @@
-import socket, struct, sys, os, mmap
+import socket, struct, sys, os, mmap, json
 import numpy as np
 
 # Defaults
 dst_ip = '169.254.1.10'
 port = 25344
 nPackets = 1000
+
+try:
+    with open("ip_cfg.json", "r", encoding="utf-8") as file:
+        data = json.load(file)
+        dst_ip = data["ip"]
+        port = int(data["port"])
+except Exception as e:
+    print(e)
+    dst_ip = '169.254.1.10'
+    port = 25344
 
 RADIO_PERIPH_ADDR = 0x43C00000
 
